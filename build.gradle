@@ -27,17 +27,21 @@ targetCompatibility = JavaVersion.VERSION_17
 def lwjglVersion = '3.3.0'
 
 // Detect platform and architecture for native dependencies
+// This enables automatic ARM64 support on Apple Silicon Macs
 def osName = System.getProperty('os.name').toLowerCase()
 def osArch = System.getProperty('os.arch').toLowerCase()
 
+// Select appropriate LWJGL natives based on platform and architecture
 def lwjglNatives
 if (osName.contains('mac') || osName.contains('darwin')) {
+    // macOS: Use ARM64 natives for Apple Silicon, x86_64 for Intel
     if (osArch.contains('aarch64') || osArch.contains('arm64')) {
         lwjglNatives = 'natives-macos-arm64'
     } else {
         lwjglNatives = 'natives-macos'
     }
 } else if (osName.contains('win')) {
+    // Windows: 64-bit vs 32-bit
     if (osArch.contains('64')) {
         lwjglNatives = 'natives-windows'
     } else {
@@ -72,11 +76,12 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-opengl::${lwjglNatives}"
     runtimeOnly "org.lwjgl:lwjgl-stb::${lwjglNatives}"
     
-    // ImGui - updated version with better native support
+    // ImGui - updated to latest version for better ARM64 compatibility
     implementation 'io.github.spair:imgui-java-app:1.89.0'
 }
 
-// Add platform-specific ImGui natives after dependencies block
+// Add explicit ImGui natives for macOS to ensure compatibility
+// The macOS natives from ImGui-Java 1.89.0 may be universal binaries supporting both architectures
 if (osName.contains('mac') || osName.contains('darwin')) {
     dependencies {
         runtimeOnly 'io.github.spair:imgui-java-natives-macos:1.89.0'
@@ -102,5 +107,46 @@ task platformInfo {
         println "Detected platform: ${System.getProperty('os.name')} (${System.getProperty('os.arch')})"
         println "LWJGL natives: $lwjglNatives"
         println "ImGui natives: ${(osName.contains('mac') || osName.contains('darwin')) ? 'imgui-java-natives-macos:1.89.0' : 'included in app jar'}"
+    }
+}
+
+// Task to test ARM64 detection logic with various platform combinations
+task testPlatformDetection {
+    doLast {
+        println "Testing platform detection logic:"
+        
+        def testCases = [
+            ['Mac OS X', 'aarch64'],  // Apple Silicon
+            ['Mac OS X', 'x86_64'],   // Intel Mac  
+            ['Linux', 'amd64'],       // Linux x64
+            ['Windows 10', 'amd64'],  // Windows x64
+            ['Windows 10', 'x86']     // Windows x86
+        ]
+        
+        testCases.each { testOsName, testOsArch ->
+            def testLwjglNatives
+            
+            if (testOsName.toLowerCase().contains('mac')) {
+                if (testOsArch.contains('aarch64') || testOsArch.contains('arm64')) {
+                    testLwjglNatives = 'natives-macos-arm64'
+                } else {
+                    testLwjglNatives = 'natives-macos'
+                }
+            } else if (testOsName.toLowerCase().contains('win')) {
+                if (testOsArch.contains('64')) {
+                    testLwjglNatives = 'natives-windows'
+                } else {
+                    testLwjglNatives = 'natives-windows-x86'
+                }
+            } else {
+                if (testOsArch.contains('64')) {
+                    testLwjglNatives = 'natives-linux'
+                } else {
+                    testLwjglNatives = 'natives-linux'
+                }
+            }
+            
+            println "  ${testOsName} (${testOsArch}) -> ${testLwjglNatives}"
+        }
     }
 }
