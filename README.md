@@ -51,8 +51,10 @@ Due to current limitations with ImGui-Java native libraries, you need to run und
    ```
 3. Extract resources and run:
    ```bash
-   jar xf build/libs/particle-life-app-all.jar .internal
-   arch -x86_64 /usr/local/opt/openjdk@17/bin/java -XstartOnFirstThread -jar build/libs/particle-life-app-all.jar
+   mkdir -p temp_internal
+   jar xf build/libs/particle-life-app-all.jar .internal -C temp_internal
+   arch -x86_64 /usr/local/opt/openjdk@17/bin/java -XstartOnFirstThread -Djava.io.tmpdir=temp_internal -jar build/libs/particle-life-app-all.jar
+   rm -rf temp_internal
    ```
 
 **Note:** Native ARM64 support pending ImGui-Java update.
