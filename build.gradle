@@ -1,76 +1,84 @@
-import org.gradle.internal.os.OperatingSystem
-
 plugins {
-    id "java"
-    id "application"                                     // for "run" task
-    id 'edu.sc.seis.launch4j' version '3.0.6'            // for generating .exe
-    id 'org.beryx.runtime' version '1.13.1'              // for generating JRE
-    id "io.github.goooler.shadow" version "8.1.8"        // only needed to make linux build
+    id 'java'
+    id 'application'
 }
 
-def buildDir = layout.buildDirectory.get().asFile
-def workingDir = "$buildDir/app"
-
 application {
-    mainClass = "com.particle_life.app.Main"  // required for "run" task
+    mainClass = "com.particle_life.app.Main"
+}
 
-    if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
-        applicationDefaultJvmArgs = ["-XstartOnFirstThread"]
+// Create a fat jar with all dependencies
+task fatJar(type: Jar) {
+    archiveBaseName = 'particle-life-app-all'
+    archiveClassifier = ''
+    
+    manifest {
+        attributes 'Main-Class': 'com.particle_life.app.Main'
+    }
+    
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// Create macOS app using jpackage
+task createMacApp(type: Exec) {
+    dependsOn fatJar
+    
+    doFirst {
+        delete "$buildDir/dist"
+        
+        def jpackageArgs = [
+            'jpackage',
+            '--type', 'app-image',
+            '--name', 'ParticleLife',
+            '--input', "$buildDir/libs",
+            '--main-jar', fatJar.archiveFileName.get(),
+            '--dest', "$buildDir/dist",
+            '--mac-package-identifier', 'com.particle.life.app',
+            '--mac-package-name', 'ParticleLife'
+        ]
+        
+        // Add icon if it exists
+        def iconFile = file('src/main/resources/icon.icns')
+        if (iconFile.exists()) {
+            jpackageArgs.addAll(['--icon', iconFile.absolutePath])
+        }
+        
+        commandLine jpackageArgs
     }
 }
 
-// copy resources to build directory
-tasks.register("copyResources", Copy) {
-    from "$projectDir/src/main/resources"
-    into workingDir
+// Create DMG installer
+task createDmg(type: Exec) {
+    dependsOn createMacApp
+    
+    doFirst {
+        def dmgArgs = [
+            'jpackage',
+            '--type', 'dmg',
+            '--name', 'ParticleLife',
+            '--app-image', "$buildDir/dist/ParticleLife.app",
+            '--dest', "$buildDir/dist"
+        ]
+        
+        commandLine dmgArgs
+    }
 }
 
-run {
-    dependsOn(tasks.copyResources)
-    delegate.workingDir = workingDir
+// Convenience task
+task packageMacOS {
+    dependsOn createDmg
+    doLast {
+        println "macOS app created at: $buildDir/dist/ParticleLife.app"
+        println "DMG installer created at: $buildDir/dist/ParticleLife-1.0.dmg"
+    }
 }
 
-launch4j {
-    icon = "${projectDir}/favicon.ico"
-    mainClassName = 'com.particle_life.app.Main'
-    dontWrapJar = true
-    requires64Bit = true
-    bundledJrePath = "jre"
-}
-
-// creates folder "jre"
-runtime {
-    options = ["--compress", "2"]
-    modules = [
-            "jdk.zipfs"  // needed for "jar" FileSystemProvider (ZipFileSystemProvider), not detected automatically by plugin
-    ]
-    additive = true
-}
-
-tasks.register('copyJre', Copy) {
-    dependsOn tasks.runtime
-
-    from "$buildDir/jre"
-    into "$workingDir/jre"
-}
-
-tasks.register('copyLaunch4j', Copy) {
-    dependsOn tasks.createExe
-
-    from "$buildDir/launch4j"
-    into workingDir
-}
-
-tasks.register('assembleApp') {
-    dependsOn tasks.copyLaunch4j, tasks.copyResources, tasks.copyJre
-}
-
-tasks.register('zipApp', Zip) {
-    dependsOn tasks.assembleApp
-    from workingDir
-    destinationDirectory = layout.buildDirectory.dir("zipApp")
-    archiveFileName = "particle-life-app.zip"
-}
+import org.gradle.internal.os.OperatingSystem
 
 group 'com.particle.life.app'
 
@@ -79,11 +87,9 @@ ext {
     imguiVersion = '1.86.2'
 }
 
-jar {
-    // This ignores all resource files when bundling the JAR.
-    // Reason: We don't want our "resources" files to be included
-    // in the JAR, but instead outside, next to the executable.
-    processResources.exclude('*')
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 project.ext.lwjglVersion = "3.3.0"
