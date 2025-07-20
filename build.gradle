@@ -3,124 +3,58 @@ plugins {
     id 'application'
 }
 
-application {
-    mainClass = "com.particle_life.app.Main"
-    applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+group = 'com.particle.life.app'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
-group 'com.particle.life.app'
-version '1.0'
-
-ext {
-    lwjglVersion = '3.3.0'
-    imguiVersion = '1.86.2'
+application {
+    mainClass = 'com.particle_life.app.Main'
+    
+    // Required for LWJGL on macOS
+    applicationDefaultJvmArgs = [
+        '-XstartOnFirstThread',
+        '-Djava.awt.headless=false'
+    ]
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
-// Detect platform for natives
-import org.gradle.internal.os.OperatingSystem
-def os = OperatingSystem.current()
-def osArch = System.getProperty("os.arch")
-
-if (os.isMacOsX()) {
-    project.ext.lwjglNatives = osArch.startsWith("aarch64") ? "natives-macos-arm64" : "natives-macos"
-} else if (os.isLinux()) {
-    project.ext.lwjglNatives = "natives-linux"
-} else if (os.isWindows()) {
-    project.ext.lwjglNatives = "natives-windows"
-}
-
-repositories {
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-}
+def lwjglVersion = '3.3.0'
+def lwjglNatives = 'natives-macos-arm64' // For M1 Mac
 
 dependencies {
-    // Particle Life Backend
+    // Core dependencies
     implementation "com.github.tom-mohr:particle-life:v0.5.1"
-
-    // Parsers
     implementation 'com.esotericsoftware.yamlbeans:yamlbeans:1.17'
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
     implementation 'org.apache.commons:commons-text:1.12.0'
     implementation 'org.joml:joml:1.10.1'
-
+    
     // LWJGL
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-    implementation "org.lwjgl:lwjgl"
-    implementation "org.lwjgl:lwjgl-glfw"
-    implementation "org.lwjgl:lwjgl-opengl"
-    implementation "org.lwjgl:lwjgl-stb"
-    
-    // LWJGL natives for runtime
-    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
-    
-    // ImGui - using the old package names that should work
-    implementation "io.github.spair:imgui-java-binding:$imguiVersion"
-    if (os.isMacOsX()) {
-        if (osArch.startsWith("aarch64")) {
-            // For M1 Macs, we might need to use the x64 version with Rosetta
-            runtimeOnly "io.github.spair:imgui-java-natives-macos:$imguiVersion"
-        } else {
-            runtimeOnly "io.github.spair:imgui-java-natives-macos:$imguiVersion"
-        }
+    ['', '-glfw', '-opengl', '-stb'].each { module ->
+        implementation "org.lwjgl:lwjgl$module"
+        runtimeOnly "org.lwjgl:lwjgl$module::$lwjglNatives"
     }
+    
+    // ImGui - simplified
+    implementation 'io.github.spair:imgui-java-app:1.86.2'
 }
 
-// Create a fat jar with proper manifest
+// Simple JAR task
 jar {
     manifest {
-        attributes(
-            'Main-Class': 'com.particle_life.app.Main',
-            'Implementation-Title': 'Particle Life',
-            'Implementation-Version': version
-        )
+        attributes 'Main-Class': application.mainClass
     }
 }
 
-// Fat JAR task that includes everything
-task fatJar(type: Jar) {
-    archiveBaseName = 'particle-life-app-all'
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    
-    manifest {
-        attributes(
-            'Main-Class': 'com.particle_life.app.Main',
-            'Implementation-Title': 'Particle Life',
-            'Implementation-Version': version
-        )
-    }
-    
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    
-    with jar
-}
-
-// Task to create the macOS app with proper configuration
-task createMacApp {
-    dependsOn fatJar
-    
-    doLast {
-        delete "$buildDir/dist"
-        
-        exec {
-            commandLine 'jpackage',
-                '--type', 'app-image',
-                '--name', 'ParticleLife',
-                '--input', "$buildDir/libs",
-                '--main-jar', fatJar.archiveFileName.get(),
-                '--dest', "$buildDir/dist",
-                '--mac-package-identifier', 'com.particle.life.app',
-                '--java-options', '-XstartOnFirstThread',
-                '--java-options', '-Djava.awt.headless=false',
-                '--java-options', '-Dapple.awt.application.appearance=system'
-        }
-    }
+// Run task
+run {
+    // Ensure we use the right JVM args on macOS
+    jvmArgs = applicationDefaultJvmArgs
 }
