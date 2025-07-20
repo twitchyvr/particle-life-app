@@ -42,8 +42,9 @@ dependencies {
         runtimeOnly "org.lwjgl:lwjgl$module::$lwjglNatives"
     }
     
-    // ImGui - simplified
-    implementation 'io.github.spair:imgui-java-app:1.86.2'
+    // ImGui - Updated to use Maven Central version instead of JitPack
+    implementation 'io.github.spair:imgui-java-app:1.86.11'
+    implementation "io.github.spair:imgui-java-natives-macos:1.86.11"
 }
 
 // Simple JAR task
@@ -51,6 +52,19 @@ jar {
     manifest {
         attributes 'Main-Class': application.mainClass
     }
+}
+
+// Fat JAR task - this creates a JAR with all dependencies included
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+    archiveBaseName = project.name + '-all'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
 }
 
 // Run task
