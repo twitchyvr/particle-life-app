@@ -25,7 +25,32 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 def lwjglVersion = '3.3.0'
-def lwjglNatives = 'natives-macos-arm64' // For M1 Mac
+
+// Detect platform and architecture for native dependencies
+def osName = System.getProperty('os.name').toLowerCase()
+def osArch = System.getProperty('os.arch').toLowerCase()
+
+def lwjglNatives
+if (osName.contains('mac') || osName.contains('darwin')) {
+    if (osArch.contains('aarch64') || osArch.contains('arm64')) {
+        lwjglNatives = 'natives-macos-arm64'
+    } else {
+        lwjglNatives = 'natives-macos'
+    }
+} else if (osName.contains('win')) {
+    if (osArch.contains('64')) {
+        lwjglNatives = 'natives-windows'
+    } else {
+        lwjglNatives = 'natives-windows-x86'
+    }
+} else {
+    // Linux and other Unix-like systems
+    if (osArch.contains('64')) {
+        lwjglNatives = 'natives-linux'
+    } else {
+        lwjglNatives = 'natives-linux'
+    }
+}
 
 dependencies {
     // Core dependencies
@@ -35,15 +60,27 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.12.0'
     implementation 'org.joml:joml:1.10.1'
     
-    // LWJGL
-    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-    ['', '-glfw', '-opengl', '-stb'].each { module ->
-        implementation "org.lwjgl:lwjgl$module"
-        runtimeOnly "org.lwjgl:lwjgl$module::$lwjglNatives"
-    }
+    // LWJGL - platform-specific natives
+    implementation platform("org.lwjgl:lwjgl-bom:${lwjglVersion}")
+    implementation 'org.lwjgl:lwjgl'
+    implementation 'org.lwjgl:lwjgl-glfw'
+    implementation 'org.lwjgl:lwjgl-opengl'
+    implementation 'org.lwjgl:lwjgl-stb'
     
-    // ImGui - simplified
-    implementation 'io.github.spair:imgui-java-app:1.86.2'
+    runtimeOnly "org.lwjgl:lwjgl::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::${lwjglNatives}"
+    runtimeOnly "org.lwjgl:lwjgl-stb::${lwjglNatives}"
+    
+    // ImGui - updated version with better native support
+    implementation 'io.github.spair:imgui-java-app:1.89.0'
+}
+
+// Add platform-specific ImGui natives after dependencies block
+if (osName.contains('mac') || osName.contains('darwin')) {
+    dependencies {
+        runtimeOnly 'io.github.spair:imgui-java-natives-macos:1.89.0'
+    }
 }
 
 // Simple JAR task
@@ -57,4 +94,13 @@ jar {
 run {
     // Ensure we use the right JVM args on macOS
     jvmArgs = applicationDefaultJvmArgs
+}
+
+// Task to display detected platform information
+task platformInfo {
+    doLast {
+        println "Detected platform: ${System.getProperty('os.name')} (${System.getProperty('os.arch')})"
+        println "LWJGL natives: $lwjglNatives"
+        println "ImGui natives: ${(osName.contains('mac') || osName.contains('darwin')) ? 'imgui-java-natives-macos:1.89.0' : 'included in app jar'}"
+    }
 }
