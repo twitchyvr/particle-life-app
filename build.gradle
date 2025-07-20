@@ -42,9 +42,9 @@ dependencies {
         runtimeOnly "org.lwjgl:lwjgl$module::$lwjglNatives"
     }
     
-    // ImGui - Updated to use Maven Central version instead of JitPack
+    // ImGui - Updated to use ARM64 natives
     implementation 'io.github.spair:imgui-java-app:1.86.11'
-    implementation "io.github.spair:imgui-java-natives-macos:1.86.11"
+    runtimeOnly "io.github.spair:imgui-java-natives-macos-arm64:1.86.11"
 }
 
 // Simple JAR task
@@ -60,6 +60,7 @@ task fatJar(type: Jar) {
         attributes 'Main-Class': application.mainClass
     }
     archiveBaseName = project.name + '-all'
+    archiveVersion = '' // Remove version from filename
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
