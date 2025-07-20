@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'com.particle.life.app'
@@ -51,6 +52,20 @@ jar {
     manifest {
         attributes 'Main-Class': application.mainClass
     }
+}
+
+// Shadow JAR task for creating fat JAR
+shadowJar {
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+    archiveBaseName = 'particle-life-app'
+    archiveClassifier = 'all'
+}
+
+// Create a fatJar task as alias for shadowJar (used by build scripts)
+task fatJar {
+    dependsOn shadowJar
 }
 
 // Run task
