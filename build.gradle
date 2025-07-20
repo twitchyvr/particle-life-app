@@ -31,23 +31,14 @@ def imguiVersion = '1.86.10'
 // Determine natives based on OS
 def os = org.gradle.internal.os.OperatingSystem.current()
 def lwjglNatives = ''
-def imguiNatives = ''
 
 if (os.isMacOsX()) {
     def arch = System.getProperty("os.arch")
-    if (arch == "aarch64") {
-        lwjglNatives = "natives-macos-arm64"
-        imguiNatives = "natives-macos"
-    } else {
-        lwjglNatives = "natives-macos"
-        imguiNatives = "natives-macos"
-    }
+    lwjglNatives = (arch == "aarch64") ? "natives-macos-arm64" : "natives-macos"
 } else if (os.isLinux()) {
     lwjglNatives = "natives-linux"
-    imguiNatives = "natives-linux"
 } else if (os.isWindows()) {
     lwjglNatives = "natives-windows"
-    imguiNatives = "natives-windows"
 }
 
 dependencies {
@@ -80,6 +71,7 @@ dependencies {
 // Shadow JAR configuration
 shadowJar {
     archiveBaseName = 'particle-life-app-all'
+    archiveClassifier = ''
     archiveVersion = ''
     manifest {
         attributes 'Main-Class': application.mainClass
@@ -90,6 +82,14 @@ shadowJar {
 // Make 'fatJar' an alias for shadowJar
 task fatJar {
     dependsOn shadowJar
+    doLast {
+        // Copy the output to the expected location
+        copy {
+            from shadowJar.archiveFile
+            into shadowJar.destinationDirectory
+            rename { 'particle-life-app-all.jar' }
+        }
+    }
 }
 
 // Run task
