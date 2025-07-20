@@ -262,12 +262,24 @@ public class Main extends App {
             // Here, we also need to save all the app settings
             // that are stored outside the app settings object
             // during runtime.
-            appSettings.palette = palettes.getActiveName();
-            appSettings.shader = shaders.getActiveName();
-            appSettings.cursorSize = cursor.size;
-            appSettings.cursorActionLeft = cursorActions1.getActiveName();
-            appSettings.cursorActionRight = cursorActions2.getActiveName();
-            appSettings.positionSetter = positionSetters.getActiveName();
+            if (palettes != null) {
+                appSettings.palette = palettes.getActiveName();
+            }
+            if (shaders != null) {
+                appSettings.shader = shaders.getActiveName();
+            }
+            if (cursor != null) {
+                appSettings.cursorSize = cursor.size;
+            }
+            if (cursorActions1 != null) {
+                appSettings.cursorActionLeft = cursorActions1.getActiveName();
+            }
+            if (cursorActions2 != null) {
+                appSettings.cursorActionRight = cursorActions2.getActiveName();
+            }
+            if (positionSetters != null) {
+                appSettings.positionSetter = positionSetters.getActiveName();
+            }
             // Note: Why are we not storing the fullscreen state here?
             // I.e. why not appSettings.startInFullscreen = isFullscreen()?
             // Because here, the glfw window is already closed,
