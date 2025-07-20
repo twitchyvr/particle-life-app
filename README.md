@@ -46,6 +46,18 @@ If you encounter any problems, ask for help in the [`#tech-support`](https://dis
   Make sure that after installing the new Java version, `java -version` actually outputs the installed version.
   Restarting the computer sometimes helps.
 
+* **Shader compilation errors** or graphics-related crashes on startup.<br>
+  This app requires modern graphics support. Please ensure:
+  - **OpenGL 4.1 or higher** is supported by your GPU
+  - **Graphics drivers are up to date** (especially important for Intel integrated graphics)
+  - **GLSL 410 core or compatible version** is available
+  
+  If you continue to experience issues:
+  - Try updating your graphics drivers from the manufacturer's website (NVIDIA, AMD, Intel)
+  - Check that your GPU supports OpenGL 4.1+ by running `glxinfo | grep "OpenGL version"` (Linux) or using GPU-Z (Windows)
+  - The app will automatically try fallback GLSL versions (330, 150, 130, 120) if 410 fails
+  - If all else fails, consider upgrading your graphics hardware
+
 ## How to make a release
 
 - Confirm that everything is working correctly and check in with others that the current state of the main branch is ready for release.
