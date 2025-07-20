@@ -28,8 +28,18 @@ targetCompatibility = JavaVersion.VERSION_17
 def lwjglVersion = '3.3.0'
 def imguiVersion = '1.86.10'
 
-// Force x86_64 natives for Rosetta compatibility
-def lwjglNatives = "natives-macos"  // This is x86_64 on older LWJGL versions
+// Determine natives based on OS
+def os = org.gradle.internal.os.OperatingSystem.current()
+def lwjglNatives = ''
+
+if (os.isMacOsX()) {
+    def arch = System.getProperty("os.arch")
+    lwjglNatives = (arch == "aarch64") ? "natives-macos-arm64" : "natives-macos"
+} else if (os.isLinux()) {
+    lwjglNatives = "natives-linux"
+} else if (os.isWindows()) {
+    lwjglNatives = "natives-windows"
+}
 
 dependencies {
     // Core dependencies
@@ -39,34 +49,50 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.12.0'
     implementation 'org.joml:joml:1.10.1'
     
-    // LWJGL - use x86_64 natives
+    // LWJGL
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
     ['', '-glfw', '-opengl', '-stb'].each { module ->
         implementation "org.lwjgl:lwjgl$module"
-        runtimeOnly "org.lwjgl:lwjgl$module::natives-macos"  // x86_64
+        if (lwjglNatives) {
+            runtimeOnly "org.lwjgl:lwjgl$module::$lwjglNatives"
+        }
     }
     
-    // ImGui - already x86_64
+    // ImGui - use the binding and lwjgl3 implementation
     implementation "io.github.spair:imgui-java-binding:$imguiVersion"
     implementation "io.github.spair:imgui-java-lwjgl3:$imguiVersion"
-    implementation "io.github.spair:imgui-java-natives-macos:$imguiVersion"
+    
+    // Try to include natives manually
+    if (os.isMacOsX()) {
+        runtimeOnly "io.github.spair:imgui-java-natives-macos:$imguiVersion"
+    }
 }
 
 // Shadow JAR configuration
 shadowJar {
-    archiveBaseName = 'particle-life-app-x86'
+    archiveBaseName = 'particle-life-app-all'
     archiveClassifier = ''
     archiveVersion = ''
     manifest {
         attributes 'Main-Class': application.mainClass
     }
     mergeServiceFiles()
-    
-    // Exclude ARM64 natives if any sneak in
-    exclude 'macos/arm64/**'
 }
 
-// Clean task to ensure fresh build
-clean {
-    delete 'build'
+// Make 'fatJar' an alias for shadowJar
+task fatJar {
+    dependsOn shadowJar
+    doLast {
+        // Copy the output to the expected location
+        copy {
+            from shadowJar.archiveFile
+            into shadowJar.destinationDirectory
+            rename { 'particle-life-app-all.jar' }
+        }
+    }
+}
+
+// Run task
+run {
+    jvmArgs = applicationDefaultJvmArgs
 }
