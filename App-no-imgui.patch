@@ -1,0 +1,11 @@
+--- a/src/main/java/com/particle_life/app/App.java
++++ b/src/main/java/com/particle_life/app/App.java
+@@ -55,7 +55,8 @@ public abstract class App {
+         
+         ImGuiLayer imGuiLayer = new ImGuiLayer(window);
+-        imGuiLayer.initImGui();
++        // Skip ImGui initialization for ARM64 compatibility
++        // imGuiLayer.initImGui();
+         setCallbacks(imGuiLayer);
+         init();
+         imGuiLayer.scaleGui(scale);
