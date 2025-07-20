@@ -42,7 +42,14 @@ Due to current limitations with ImGui-Java native libraries, you need to run und
 
 1. Install x86_64 Java:
    ```bash
-   arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   # Check if Homebrew is already installed under x86_64
+   if ! arch -x86_64 /usr/local/bin/brew --version &>/dev/null; then
+       echo "Homebrew not found. Installing Homebrew for x86_64..."
+       arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   else
+       echo "Homebrew is already installed under x86_64."
+   fi
+   # Install Java using Homebrew
    arch -x86_64 /usr/local/bin/brew install openjdk@17
    ```
 2. Build the project:
