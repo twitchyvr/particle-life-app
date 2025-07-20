@@ -142,7 +142,7 @@ public abstract class App {
         if (window == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
         // set window icon (not supported on macOS)
-        if (!System.getProperty("os.name").toLowerCase().contains("mac")) {
+        if (!System.getProperty("os.name").toLowerCase().startsWith("mac")) {
             try {
                 setWindowIcon(iconPath);
             } catch (IOException e) {
