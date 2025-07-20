@@ -5,146 +5,122 @@ plugins {
 
 application {
     mainClass = "com.particle_life.app.Main"
+    applicationDefaultJvmArgs = ['-XstartOnFirstThread']
 }
-
-// Create a fat jar with all dependencies
-task fatJar(type: Jar) {
-    archiveBaseName = 'particle-life-app-all'
-    archiveClassifier = ''
-    
-    manifest {
-        attributes 'Main-Class': 'com.particle_life.app.Main'
-    }
-    
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    with jar
-    
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-// Create macOS app using jpackage
-task createMacApp(type: Exec) {
-    dependsOn fatJar
-    
-    doFirst {
-        delete "$buildDir/dist"
-        
-        def jpackageArgs = [
-            'jpackage',
-            '--type', 'app-image',
-            '--name', 'ParticleLife',
-            '--input', "$buildDir/libs",
-            '--main-jar', fatJar.archiveFileName.get(),
-            '--dest', "$buildDir/dist",
-            '--mac-package-identifier', 'com.particle.life.app',
-            '--mac-package-name', 'ParticleLife'
-        ]
-        
-        // Add icon if it exists
-        def iconFile = file('src/main/resources/icon.icns')
-        if (iconFile.exists()) {
-            jpackageArgs.addAll(['--icon', iconFile.absolutePath])
-        }
-        
-        commandLine jpackageArgs
-    }
-}
-
-// Create DMG installer
-task createDmg(type: Exec) {
-    dependsOn createMacApp
-    
-    doFirst {
-        def dmgArgs = [
-            'jpackage',
-            '--type', 'dmg',
-            '--name', 'ParticleLife',
-            '--app-image', "$buildDir/dist/ParticleLife.app",
-            '--dest', "$buildDir/dist"
-        ]
-        
-        commandLine dmgArgs
-    }
-}
-
-// Convenience task
-task packageMacOS {
-    dependsOn createDmg
-    doLast {
-        println "macOS app created at: $buildDir/dist/ParticleLife.app"
-        println "DMG installer created at: $buildDir/dist/ParticleLife-1.0.dmg"
-    }
-}
-
-import org.gradle.internal.os.OperatingSystem
 
 group 'com.particle.life.app'
+version '1.0'
 
 ext {
     lwjglVersion = '3.3.0'
     imguiVersion = '1.86.2'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
-project.ext.lwjglVersion = "3.3.0"
+// Detect platform for natives
+import org.gradle.internal.os.OperatingSystem
+def os = OperatingSystem.current()
+def osArch = System.getProperty("os.arch")
 
-switch (OperatingSystem.current()) {
-    case OperatingSystem.LINUX:
-        def osArch = System.getProperty("os.arch")
-        project.ext.natives = osArch.startsWith("arm") || osArch.startsWith("aarch64")
-                ? "linux-${osArch.contains("64") || osArch.startsWith("armv8") ? "arm64" : "arm32"}"
-                : "linux"
-        break
-    case OperatingSystem.MAC_OS:
-        project.ext.natives = "macos"
-        break
-    case OperatingSystem.WINDOWS:
-        def osArch = System.getProperty("os.arch")
-        project.ext.natives = osArch.contains("64")
-                ? "windows${osArch.startsWith("aarch64") ? "-arm64" : ""}"
-                : "windows-x86"
-        break
+if (os.isMacOsX()) {
+    project.ext.lwjglNatives = osArch.startsWith("aarch64") ? "natives-macos-arm64" : "natives-macos"
+} else if (os.isLinux()) {
+    project.ext.lwjglNatives = "natives-linux"
+} else if (os.isWindows()) {
+    project.ext.lwjglNatives = "natives-windows"
 }
 
 repositories {
     mavenCentral()
-    mavenLocal()
-
-    // JitPack allows to easily add dependencies on GitHub repos
-    // (e.g. implementation 'com.github.User:Repo:Tag')
-    maven { url "https://jitpack.io" }  // this line should be at the end of the repositories
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
-
     // Particle Life Backend
     implementation "com.github.tom-mohr:particle-life:v0.5.1"
 
-    // YAML Parser "YamlBeans"
+    // Parsers
     implementation 'com.esotericsoftware.yamlbeans:yamlbeans:1.17'
-
-    // TOML Parser
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
-
-    // Apache Commons Text (for Levenshtein distance)
     implementation 'org.apache.commons:commons-text:1.12.0'
-
-    // Linear Algebra Library "JOML"
     implementation 'org.joml:joml:1.10.1'
 
-    // GUI Library "Dear ImGui"
+    // LWJGL
+    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+    implementation "org.lwjgl:lwjgl"
+    implementation "org.lwjgl:lwjgl-glfw"
+    implementation "org.lwjgl:lwjgl-opengl"
+    implementation "org.lwjgl:lwjgl-stb"
+    
+    // LWJGL natives for runtime
+    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+    
+    // ImGui - using the old package names that should work
     implementation "io.github.spair:imgui-java-binding:$imguiVersion"
-    implementation "io.github.spair:imgui-java-natives-$natives:$imguiVersion"
+    if (os.isMacOsX()) {
+        if (osArch.startsWith("aarch64")) {
+            // For M1 Macs, we might need to use the x64 version with Rosetta
+            runtimeOnly "io.github.spair:imgui-java-natives-macos:$imguiVersion"
+        } else {
+            runtimeOnly "io.github.spair:imgui-java-natives-macos:$imguiVersion"
+        }
+    }
+}
 
-    // LWJGL (Lightweight Java Game Library)
-    // see https://www.lwjgl.org/customize for a list of all available contents
-    [".lwjgl", ".glfw", ".opengl", ".stb"].each {
-        implementation "org.lwjgl.osgi:org.lwjgl$it:$lwjglVersion"
+// Create a fat jar with proper manifest
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'com.particle_life.app.Main',
+            'Implementation-Title': 'Particle Life',
+            'Implementation-Version': version
+        )
+    }
+}
+
+// Fat JAR task that includes everything
+task fatJar(type: Jar) {
+    archiveBaseName = 'particle-life-app-all'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    
+    manifest {
+        attributes(
+            'Main-Class': 'com.particle_life.app.Main',
+            'Implementation-Title': 'Particle Life',
+            'Implementation-Version': version
+        )
+    }
+    
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
+    with jar
+}
+
+// Task to create the macOS app with proper configuration
+task createMacApp {
+    dependsOn fatJar
+    
+    doLast {
+        delete "$buildDir/dist"
+        
+        exec {
+            commandLine 'jpackage',
+                '--type', 'app-image',
+                '--name', 'ParticleLife',
+                '--input', "$buildDir/libs",
+                '--main-jar', fatJar.archiveFileName.get(),
+                '--dest', "$buildDir/dist",
+                '--mac-package-identifier', 'com.particle.life.app',
+                '--java-options', '-XstartOnFirstThread',
+                '--java-options', '-Djava.awt.headless=false',
+                '--java-options', '-Dapple.awt.application.appearance=system'
+        }
     }
 }
