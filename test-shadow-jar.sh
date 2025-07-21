@@ -8,13 +8,15 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 cd build/libs
 
-# The JAR has a different name than expected
-if [ -f "particle-life-app-all.jar" ]; then
-    echo "✅ Found JAR: particle-life-app-all.jar"
-    echo "Size: $(ls -lh particle-life-app-all.jar | awk '{print $5}')"
+# Dynamically find the JAR file
+JAR_FILE=$(ls particle-life-app-*.jar 2>/dev/null | head -n 1)
+
+if [ -n "$JAR_FILE" ]; then
+    echo "✅ Found JAR: $JAR_FILE"
+    echo "Size: $(ls -lh "$JAR_FILE" | awk '{print $5}')"
     echo ""
     echo "Running..."
-    java -XstartOnFirstThread -jar particle-life-app-all.jar
+    java -XstartOnFirstThread -jar "$JAR_FILE"
 else
     echo "❌ JAR not found"
     ls -la
