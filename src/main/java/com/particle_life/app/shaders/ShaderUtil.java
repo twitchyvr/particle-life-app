@@ -27,25 +27,29 @@ final class ShaderUtil {
         int shaderObject = glCreateShader(type);
         glShaderSource(shaderObject, src);
         glCompileShader(shaderObject);
-        printShaderErrors(shaderObject, name);
+        printShaderErrors(shaderObject, name + " (" + resource + ")");
         return shaderObject;
     }
 
-    private static void printShaderErrors(int shader, String shaderName) {
+    private static void printShaderErrors(int shader, String shaderName) throws IOException {
 
         int[] params = new int[10];
         glGetShaderiv(shader, GL_COMPILE_STATUS, params);
         int isCompiled = params[0];
         if (isCompiled == GL_FALSE) {
-            System.err.printf("Error while compiling %s shader. Info log:%n", shaderName);
+            System.err.printf("====== SHADER COMPILATION ERROR ======%n");
+            System.err.printf("Shader: %s%n", shaderName);
+            System.err.printf("Error: Compilation failed%n");
 
             glGetShaderiv(shader, GL_INFO_LOG_LENGTH, params);
             int maxLength = params[0];
 
             String infoLog = glGetShaderInfoLog(shader, maxLength);
 
-            System.err.println(infoLog);
+            System.err.printf("Full compilation log:%n%s%n", infoLog);
+            System.err.printf("========================================%n");
 
+            throw new IOException("Failed to compile shader " + shaderName + ": " + infoLog);
         }
     }
 }
