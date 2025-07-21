@@ -32,6 +32,16 @@ else
     # Download Roboto font
     curl -L "https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Regular.ttf" \
          -o assets/fonts/Roboto-Regular.ttf
+    
+    # Verify the integrity of the downloaded file
+    echo "Verifying integrity of Roboto-Regular.ttf..."
+    EXPECTED_SHA256="e8b7f1b5b3c2c3e5b8f8e5b3c2c3e5b8f8e5b3c2c3e5b8f8e5b3c2c3e5b8f8e" # Replace with actual checksum
+    ACTUAL_SHA256=$(shasum -a 256 assets/fonts/Roboto-Regular.ttf | awk '{print $1}')
+    if [ "$EXPECTED_SHA256" != "$ACTUAL_SHA256" ]; then
+        echo "Error: Integrity check failed for Roboto-Regular.ttf"
+        rm -f assets/fonts/Roboto-Regular.ttf
+        exit 1
+    fi
 fi
 
 # Rebuild with assets
