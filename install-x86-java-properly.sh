@@ -20,11 +20,21 @@ arch -x86_64 /usr/local/bin/brew install openjdk@17
 # Create symlinks for x86_64 Java
 echo "WARNING: This script will create a system-wide symlink for x86_64 Java in /Library/Java/JavaVirtualMachines."
 echo "This requires elevated privileges (sudo) and may overwrite any existing symlink or file at the target location."
+# Validate the source path
+if [ ! -e "/usr/local/opt/openjdk@17/libexec/openjdk.jdk" ]; then
+    echo "Error: Source path '/usr/local/opt/openjdk@17/libexec/openjdk.jdk' does not exist."
+    echo "Please ensure that x86_64 OpenJDK 17 is installed correctly."
+    exit 1
+fi
+
+# Get user confirmation
 read -p "Do you want to proceed? (yes/no): " confirm
-if [[ "$confirm" != "yes" ]]; then
+if [[ "${confirm,,}" != "yes" ]]; then
     echo "Operation canceled by the user."
     exit 1
 fi
+
+# Create the symlink
 sudo ln -sfn /usr/local/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17-x86_64.jdk
 
 echo ""
