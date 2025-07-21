@@ -62,8 +62,11 @@ shadowJar {
     }
     mergeServiceFiles()
     
-    // Exclude ARM64 natives if any sneak in
-    exclude 'macos/arm64/**'
+    // Dynamically exclude ARM64 natives if any sneak in
+    def arm64Files = fileTree(dir: 'build', includes: ['**/macos/arm64/**']).files
+    arm64Files.each { file ->
+        exclude file.path
+    }
 }
 
 // Clean task to ensure fresh build
