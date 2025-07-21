@@ -44,6 +44,7 @@ public class ResourceAccess {
                 return new String(inputStream.readAllBytes());
             }
         } catch (IOException e) {
+            LOGGER.warning("Failed to read resource from classpath: " + e.getMessage());
             // Continue to filesystem fallback
         }
         
