@@ -55,15 +55,15 @@ public class ShaderProvider implements InfoWrapperProvider<ParticleShader> {
             }
         }
 
-        return configs.stream()
+        List<InfoWrapper<ParticleShader>> result = configs.stream()
                 // only add the shaders that use shader files that actually exist
                 // and print warnings for all other shaders
                 .filter(config -> {
                     for (String filename : new String[]{config.vertex, config.geometry, config.fragment}) {
-                        if (!files.contains(filename)) {
+                        if (filename != null && !files.contains(filename)) {
                             System.err.printf(
-                                    "Shader file '%s' used by shader '%s' doesn't exist. %n",
-                                    config.name, filename
+                                    "Shader file '%s' used by shader '%s' doesn't exist.%n",
+                                    filename, config.name
                             );
                             return false;
                         }
@@ -77,18 +77,27 @@ public class ShaderProvider implements InfoWrapperProvider<ParticleShader> {
                                 config.description,
                                 new ParticleShader(
                                         "shaders/" + config.vertex,
-                                        "shaders/" + config.geometry,
+                                        config.geometry != null ? "shaders/" + config.geometry : null,
                                         "shaders/" + config.fragment,
                                         config.blend
                                 )
                         );
                     } catch (IOException e) {
+                        System.err.printf("Failed to compile shader '%s': %s%n", config.name, e.getMessage());
                         e.printStackTrace();
                         return null;
                     }
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        
+        // Ensure at least one shader loaded successfully
+        if (result.isEmpty()) {
+            throw new RuntimeException("No shaders could be compiled successfully. This indicates a serious graphics compatibility issue. Please update your graphics drivers and ensure OpenGL 4.1+ support.");
+        }
+        
+        System.out.printf("Successfully loaded %d/%d shaders%n", result.size(), configs.size());
+        return result;
     }
 
     private List<ShaderConfigEntry> getConfigs(String yamlFileContent) {

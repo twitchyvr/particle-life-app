@@ -157,14 +157,19 @@ public class Main extends App {
         // Method initializes LWJGL3 renderer.
         // This method SHOULD be called after you've initialized your ImGui configuration (fonts and so on).
         // ImGui context should be created as well.
-        imGuiGl3.init("#version 410 core");
+        try {
+            imGuiGl3.init("#version 410 core");
+        } catch (Exception e) {
+            this.error = new RuntimeException("Failed to initialize graphics system. This may be due to outdated graphics drivers or unsupported GPU.\n\nPlease ensure:\n- Your graphics drivers are up to date\n- Your GPU supports OpenGL 2.1 or higher\n- GLSL 120 or higher is supported", e);
+            return;
+        }
 
         particleRenderer.init();
 
         try {
             cursorShader = new CursorShader();
         } catch (IOException e) {
-            this.error = e;
+            this.error = new RuntimeException("Failed to load cursor shader: " + e.getMessage(), e);
             return;
         }
 
@@ -185,7 +190,15 @@ public class Main extends App {
             cursorActions1.setActiveByName(appSettings.cursorActionLeft);
             cursorActions2.setActiveByName(appSettings.cursorActionRight);
         } catch (Exception e) {
-            this.error = e;
+            String errorMsg = "Failed to initialize application components.";
+            if (e.getMessage() != null && e.getMessage().contains("shader")) {
+                errorMsg += "\n\nShader compilation error detected. This may be due to:\n" +
+                           "- Outdated graphics drivers\n" +
+                           "- Unsupported GPU or OpenGL version\n" +
+                           "- Corrupted shader files\n\n" +
+                           "Please update your graphics drivers and ensure your GPU supports OpenGL 4.1 or higher.";
+            }
+            this.error = new RuntimeException(errorMsg, e);
             return;
         }
 
@@ -262,12 +275,24 @@ public class Main extends App {
             // Here, we also need to save all the app settings
             // that are stored outside the app settings object
             // during runtime.
-            appSettings.palette = palettes.getActiveName();
-            appSettings.shader = shaders.getActiveName();
-            appSettings.cursorSize = cursor.size;
-            appSettings.cursorActionLeft = cursorActions1.getActiveName();
-            appSettings.cursorActionRight = cursorActions2.getActiveName();
-            appSettings.positionSetter = positionSetters.getActiveName();
+            if (palettes != null) {
+                appSettings.palette = palettes.getActiveName();
+            }
+            if (shaders != null) {
+                appSettings.shader = shaders.getActiveName();
+            }
+            if (cursor != null) {
+                appSettings.cursorSize = cursor.size;
+            }
+            if (cursorActions1 != null) {
+                appSettings.cursorActionLeft = cursorActions1.getActiveName();
+            }
+            if (cursorActions2 != null) {
+                appSettings.cursorActionRight = cursorActions2.getActiveName();
+            }
+            if (positionSetters != null) {
+                appSettings.positionSetter = positionSetters.getActiveName();
+            }
             // Note: Why are we not storing the fullscreen state here?
             // I.e. why not appSettings.startInFullscreen = isFullscreen()?
             // Because here, the glfw window is already closed,
@@ -282,13 +307,21 @@ public class Main extends App {
         }
 
         try {
-            loop.stop(1000);
-            physics.shutdown(1000);
-            physicsSnapshotLoadDistributor.shutdown(1000);
+            if (loop != null) {
+                loop.stop(1000);
+            }
+            if (physics != null) {
+                physics.shutdown(1000);
+            }
+            if (physicsSnapshotLoadDistributor != null) {
+                physicsSnapshotLoadDistributor.shutdown(1000);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        imGuiGl3.dispose();
+        if (imGuiGl3 != null) {
+            imGuiGl3.dispose();
+        }
     }
 
     @Override
