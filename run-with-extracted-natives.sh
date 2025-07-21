@@ -3,11 +3,18 @@
 echo "Running Particle Life with extracted natives..."
 
 # Setup directories
-WORK_DIR="/tmp/particle-life-runtime"
+WORK_DIR=$(mktemp -d -t particle-life-runtime-XXXXXX)
 JAR_PATH="$HOME/Documents/particle-life-app/build/libs/particle-life-app-all.jar"
 
-# Clean and create work directory
-rm -rf "$WORK_DIR"
+# Define cleanup function
+cleanup() {
+    echo "Cleaning up temporary directory..."
+    rm -rf "$WORK_DIR"
+}
+
+# Ensure cleanup on script exit or interruption
+trap cleanup EXIT INT TERM
+# Create work directory for natives
 mkdir -p "$WORK_DIR/natives"
 
 # Extract the JAR to check for natives
@@ -26,11 +33,13 @@ done
 echo ""
 echo "Native library architectures:"
 cd natives
-for lib in *.dylib *.jnilib 2>/dev/null; do
+shopt -s nullglob
+for lib in *.dylib *.jnilib; do
     if [ -f "$lib" ]; then
         echo "$lib: $(lipo -info "$lib" 2>&1)"
     fi
 done
+shopt -u nullglob
 
 # Try to run with correct library path
 echo ""

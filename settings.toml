@@ -15,4 +15,4 @@ zoom_smoothness = 0.3
 particle_size_independent = false
 fullscreen = true
 position_setter = "centered"
-palette = "Natural Rainbow.map"
+palette = "Natural_Rainbow.map"
