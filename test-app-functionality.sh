@@ -11,4 +11,4 @@ fi
 # Check OpenGL support
 echo ""
 echo "Checking OpenGL support:"
-arch -x86_64 /usr/local/opt/openjdk@17/bin/java -XstartOnFirstThread -Dorg.lwjgl.opengl.Display.enableHighDPI=true -cp build/libs/particle-life-app-x86.jar -Dorg.lwjgl.util.Debug=true org.lwjgl.opengl.GL
+arch -x86_64 /usr/local/opt/openjdk@17/bin/java -XstartOnFirstThread -Dorg.lwjgl.opengl.Display.enableHighDPI=true -cp build/libs/particle-life-app-x86.jar -Dorg.lwjgl.util.Debug=true com.example.Main
