@@ -106,7 +106,9 @@ public class ResourceAccess {
         }
         
         Path tempFile = Files.createTempFile("particle-life-resource-", extension);
-        tempFile.toFile().deleteOnExit(); // Clean up on JVM exit
+        synchronized (tempFiles) {
+            tempFiles.add(tempFile);
+        }
         
         // Extract resource to temp file
         try (InputStream inputStream = resource.openStream()) {
