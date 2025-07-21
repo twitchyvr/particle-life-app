@@ -1,3 +1,5 @@
+--- a/src/main/java/imgui/gl3/ImGuiImplGl3.java
++++ b/src/main/java/imgui/gl3/ImGuiImplGl3.java
 @@ -194,6 +194,11 @@
  
              for (int cmdBufferIdx = 0; cmdBufferIdx < drawData.getCmdListCmdBufferSize(cmdListIdx); cmdBufferIdx++) {

@@ -197,6 +197,8 @@ public final class ImGuiImplGl3 {
                 final float clipRectX = (clipRect.x - displayPos.x) * framebufferScale.x;
                 final float clipRectY = (clipRect.y - displayPos.y) * framebufferScale.y;
                 final float clipRectZ = (clipRect.z - displayPos.x) * framebufferScale.x;
+                final float clipRectW = (clipRect.w - displayPos.y) * framebufferScale.y;                final float clipRectY = (clipRect.y - displayPos.y) * framebufferScale.y;
+                final float clipRectZ = (clipRect.z - displayPos.x) * framebufferScale.x;
                 final float clipRectW = (clipRect.w - displayPos.y) * framebufferScale.y;
 
                 if (clipRectX < fbWidth && clipRectY < fbHeight && clipRectZ >= 0.0f && clipRectW >= 0.0f) {

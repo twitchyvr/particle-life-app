@@ -1,3 +1,5 @@
+--- a/src/main/java/com/particle_life/app/ImGuiLayer.java
++++ b/src/main/java/com/particle_life/app/ImGuiLayer.java
 @@ -96,7 +96,7 @@
          });
  

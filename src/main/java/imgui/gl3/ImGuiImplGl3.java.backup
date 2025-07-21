@@ -193,6 +193,8 @@ public final class ImGuiImplGl3 {
 
             for (int cmdBufferIdx = 0; cmdBufferIdx < drawData.getCmdListCmdBufferSize(cmdListIdx); cmdBufferIdx++) {
                 drawData.getCmdListCmdBufferClipRect(clipRect, cmdListIdx, cmdBufferIdx);
+
+                final float clipRectX = (clipRect.x - displayPos.x) * framebufferScale.x;
                 final float clipRectY = (clipRect.y - displayPos.y) * framebufferScale.y;
                 final float clipRectZ = (clipRect.z - displayPos.x) * framebufferScale.x;
                 final float clipRectW = (clipRect.w - displayPos.y) * framebufferScale.y;

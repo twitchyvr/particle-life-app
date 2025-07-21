@@ -1,0 +1,27 @@
+--- a/src/main/java/com/particle_life/app/ImGuiLayer.java
++++ b/src/main/java/com/particle_life/app/ImGuiLayer.java
+@@ -35,6 +35,7 @@ public class ImGuiLayer {
+     private final long[] mouseCursors = new long[ImGuiMouseCursor.COUNT];
+ 
+     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
++    private ImGuiIO io;
+ 
+     @SuppressWarnings("FieldCanBeLocal")
+     private Graphics graphics;
+@@ -40,7 +41,7 @@ public class ImGuiLayer {
+     @SuppressWarnings("FieldCanBeLocal")
+     private Graphics graphics;
+ 
+-    public void init(Graphics graphics) {
++    public void init(Graphics graphics) {
+         this.graphics = graphics;
+ 
+         // Initialize ImGui
+@@ -43,7 +44,7 @@ public class ImGuiLayer {
+         ImGui.createContext();
+ 
+-        ImGuiIO io = ImGui.getIO();
++        io = ImGui.getIO();
+         io.setIniFilename(null); // We don't want to save .ini file
+         io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard);  // Enable Keyboard Controls
+         io.setConfigFlags(io.getConfigFlags() | ImGuiConfigFlags.DockingEnable); // Enable Docking
