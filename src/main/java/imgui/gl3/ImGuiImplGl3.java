@@ -89,14 +89,76 @@ public final class ImGuiImplGl3 {
      * </pre>
      * <p>
      * If the argument is null, then a "#version 130" string will be used by default.
+     * If shader compilation fails, fallback versions will be tried automatically.
      */
     public void init(final String glslVersion) {
         readGlVersion();
         setupBackendCapabilitiesFlags();
 
-        this.glslVersion = Objects.requireNonNullElse(glslVersion, "#version 130");
-
-        createDeviceObjects();
+        String requestedVersion = Objects.requireNonNullElse(glslVersion, "#version 130");
+        
+        // Try the requested version first, then fallback versions if it fails
+        String[] fallbackVersions = {
+            requestedVersion,
+            "#version 330 core", 
+            "#version 330",
+            "#version 150",
+            "#version 140", 
+            "#version 130",
+            "#version 120"
+        };
+        
+        boolean shadersCreated = false;
+        Exception lastException = null;
+        
+        for (String version : fallbackVersions) {
+            // Skip if we already tried this version or if it's null
+            if (version == null || version.equals(this.glslVersion)) continue;
+            
+            this.glslVersion = version;
+            try {
+                createDeviceObjects();
+                shadersCreated = true;
+                System.out.printf("ImGui shaders compiled successfully with GLSL version: %s%n", version);
+                break;
+            } catch (Exception e) {
+                lastException = e;
+                System.err.printf("Failed to compile ImGui shaders with GLSL version %s, trying fallback...%n", version);
+                // Clean up any partially created objects
+                try {
+                    if (gShaderHandle != 0) {
+                        glDeleteProgram(gShaderHandle);
+                        gShaderHandle = 0;
+                    }
+                    if (gVertHandle != 0) {
+                        glDeleteShader(gVertHandle);
+                        gVertHandle = 0;
+                    }
+                    if (gFragHandle != 0) {
+                        glDeleteShader(gFragHandle);
+                        gFragHandle = 0;
+                    }
+                } catch (Exception cleanupEx) {
+                    // Ignore cleanup errors
+                }
+            }
+        }
+        
+        if (!shadersCreated) {
+            System.err.printf("====== CRITICAL ERROR ======%n");
+            System.err.printf("Failed to compile ImGui shaders with any supported GLSL version!%n");
+            System.err.printf("GPU/Driver requirements:%n");
+            System.err.printf("- OpenGL 2.1 or higher%n");
+            System.err.printf("- GLSL 120 or higher%n");
+            System.err.printf("- Updated graphics drivers%n");
+            System.err.printf("==============================%n");
+            
+            if (lastException != null) {
+                throw new RuntimeException("Failed to initialize ImGui with any supported GLSL version. Please update your graphics drivers or check GPU compatibility.", lastException);
+            } else {
+                throw new RuntimeException("Failed to initialize ImGui with any supported GLSL version. Please update your graphics drivers or check GPU compatibility.");
+            }
+        }
     }
 
     /**
@@ -326,7 +388,18 @@ public final class ImGuiImplGl3 {
         glCompileShader(id);
 
         if (glGetShaderi(id, GL_COMPILE_STATUS) == GL_FALSE) {
-            throw new IllegalStateException("Failed to compile shader:\n" + glGetShaderInfoLog(id));
+            String shaderTypeString = (type == GL_VERTEX_SHADER) ? "vertex" : "fragment";
+            String infoLog = glGetShaderInfoLog(id);
+            
+            // Log to console with detailed information
+            System.err.printf("====== IMGUI SHADER COMPILATION ERROR ======%n");
+            System.err.printf("Shader: ImGui internal %s shader%n", shaderTypeString);
+            System.err.printf("GLSL Version: %s%n", glslVersion);
+            System.err.printf("Error: Compilation failed%n");
+            System.err.printf("Full compilation log:%n%s%n", infoLog);
+            System.err.printf("===============================================%n");
+            
+            throw new IllegalStateException("Failed to compile ImGui " + shaderTypeString + " shader (GLSL version: " + glslVersion + "):\n" + infoLog);
         }
 
         return id;

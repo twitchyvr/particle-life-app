@@ -157,14 +157,19 @@ public class Main extends App {
         // Method initializes LWJGL3 renderer.
         // This method SHOULD be called after you've initialized your ImGui configuration (fonts and so on).
         // ImGui context should be created as well.
-        imGuiGl3.init("#version 410 core");
+        try {
+            imGuiGl3.init("#version 410 core");
+        } catch (Exception e) {
+            this.error = new RuntimeException("Failed to initialize graphics system. This may be due to outdated graphics drivers or unsupported GPU.\n\nPlease ensure:\n- Your graphics drivers are up to date\n- Your GPU supports OpenGL 2.1 or higher\n- GLSL 120 or higher is supported", e);
+            return;
+        }
 
         particleRenderer.init();
 
         try {
             cursorShader = new CursorShader();
         } catch (IOException e) {
-            this.error = e;
+            this.error = new RuntimeException("Failed to load cursor shader: " + e.getMessage(), e);
             return;
         }
 
@@ -185,7 +190,15 @@ public class Main extends App {
             cursorActions1.setActiveByName(appSettings.cursorActionLeft);
             cursorActions2.setActiveByName(appSettings.cursorActionRight);
         } catch (Exception e) {
-            this.error = e;
+            String errorMsg = "Failed to initialize application components.";
+            if (e.getMessage() != null && e.getMessage().contains("shader")) {
+                errorMsg += "\n\nShader compilation error detected. This may be due to:\n" +
+                           "- Outdated graphics drivers\n" +
+                           "- Unsupported GPU or OpenGL version\n" +
+                           "- Corrupted shader files\n\n" +
+                           "Please update your graphics drivers and ensure your GPU supports OpenGL 4.1 or higher.";
+            }
+            this.error = new RuntimeException(errorMsg, e);
             return;
         }
 

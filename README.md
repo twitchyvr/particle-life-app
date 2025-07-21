@@ -99,6 +99,18 @@ If you encounter any problems, ask for help in the [`#tech-support`](https://dis
   Make sure that after installing the new Java version, `java -version` actually outputs the installed version.
   Restarting the computer sometimes helps.
 
+* **Shader compilation errors** or graphics-related crashes on startup.<br>
+  This app requires modern graphics support. Please ensure:
+  - **OpenGL 4.1 or higher** is supported by your GPU
+  - **Graphics drivers are up to date** (especially important for Intel integrated graphics)
+  - **GLSL 410 core or compatible version** is available
+  
+  If you continue to experience issues:
+  - Try updating your graphics drivers from the manufacturer's website (NVIDIA, AMD, Intel)
+  - Check that your GPU supports OpenGL 4.1+ by running `glxinfo | grep "OpenGL version"` (Linux) or using GPU-Z (Windows)
+  - The app will automatically try fallback GLSL versions (330, 150, 130, 120) if 410 fails
+  - If all else fails, consider upgrading your graphics hardware
+  - 
 * **Apple Silicon (ARM64) Macs**: If the application seems slow or encounters native library issues:
   - Ensure you're using an ARM64 version of Java (check with `java -version` - it should show `aarch64` in the output)
   - If using x86_64 Java, consider switching to an ARM64 build for better performance
