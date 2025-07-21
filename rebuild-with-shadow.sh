@@ -2,8 +2,8 @@
 
 echo "Rebuilding with Shadow plugin..."
 
-# Set Java 17
-export JAVA_HOME=/opt/homebrew/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home
+# Set Java 17 dynamically
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 export PATH="$JAVA_HOME/bin:$PATH"
 
 # Clean everything
