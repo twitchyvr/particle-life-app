@@ -3,7 +3,8 @@
 echo "Complete fix and build script..."
 
 # Set Java 17 for all operations
-export JAVA_HOME=/opt/homebrew/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home
+JAVA_HOME_PATH=/opt/homebrew/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home
+export JAVA_HOME="$JAVA_HOME_PATH"
 export PATH="$JAVA_HOME/bin:$PATH"
 
 echo "Using Java:"
