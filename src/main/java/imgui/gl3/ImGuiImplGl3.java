@@ -192,7 +192,7 @@ public final class ImGuiImplGl3 {
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, drawData.getCmdListIdxBufferData(cmdListIdx), GL_STREAM_DRAW);
 
             for (int cmdBufferIdx = 0; cmdBufferIdx < drawData.getCmdListCmdBufferSize(cmdListIdx); cmdBufferIdx++) {
-                drawData.getCmdListCmdBufferClipRect(cmdListIdx, cmdBufferIdx, clipRect);
+                drawData.getCmdListCmdBufferClipRect(clipRect, cmdListIdx, cmdBufferIdx);
 
                 final float clipRectX = (clipRect.x - displayPos.x) * framebufferScale.x;
                 final float clipRectY = (clipRect.y - displayPos.y) * framebufferScale.y;
@@ -204,11 +204,12 @@ public final class ImGuiImplGl3 {
                     glScissor((int) clipRectX, (int) (fbHeight - clipRectW), (int) (clipRectZ - clipRectX), (int) (clipRectW - clipRectY));
 
                     // Bind texture, Draw
-                    final int textureId = drawData.getCmdListCmdBufferTextureId(cmdListIdx, cmdBufferIdx);
+                    final long textureIdLong = drawData.getCmdListCmdBufferTextureId(cmdListIdx, cmdBufferIdx);
+                    final int textureId = (int) textureIdLong;
                     final int elemCount = drawData.getCmdListCmdBufferElemCount(cmdListIdx, cmdBufferIdx);
                     final int idxBufferOffset = drawData.getCmdListCmdBufferIdxOffset(cmdListIdx, cmdBufferIdx);
                     final int vtxBufferOffset = drawData.getCmdListCmdBufferVtxOffset(cmdListIdx, cmdBufferIdx);
-                    final int indices = idxBufferOffset * ImDrawData.SIZEOF_IM_DRAW_IDX;
+                    final int indices = idxBufferOffset * ImDrawData.sizeOfImDrawIdx();
 
                     glBindTexture(GL_TEXTURE_2D, textureId);
 
@@ -376,9 +377,9 @@ public final class ImGuiImplGl3 {
         glEnableVertexAttribArray(gAttribLocationVtxPos);
         glEnableVertexAttribArray(gAttribLocationVtxUV);
         glEnableVertexAttribArray(gAttribLocationVtxColor);
-        glVertexAttribPointer(gAttribLocationVtxPos, 2, GL_FLOAT, false, ImDrawData.SIZEOF_IM_DRAW_VERT, 0);
-        glVertexAttribPointer(gAttribLocationVtxUV, 2, GL_FLOAT, false, ImDrawData.SIZEOF_IM_DRAW_VERT, 8);
-        glVertexAttribPointer(gAttribLocationVtxColor, 4, GL_UNSIGNED_BYTE, true, ImDrawData.SIZEOF_IM_DRAW_VERT, 16);
+        glVertexAttribPointer(gAttribLocationVtxPos, 2, GL_FLOAT, false, ImDrawData.sizeOfImDrawVert(), 0);
+        glVertexAttribPointer(gAttribLocationVtxUV, 2, GL_FLOAT, false, ImDrawData.sizeOfImDrawVert(), 8);
+        glVertexAttribPointer(gAttribLocationVtxColor, 4, GL_UNSIGNED_BYTE, true, ImDrawData.sizeOfImDrawVert(), 16);
     }
 
     private int createAndCompileShader(final int type, final CharSequence source) {

@@ -8,10 +8,15 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ResourceAccess {
+    
+    private static final Logger LOGGER = Logger.getLogger(ResourceAccess.class.getName());
+    private static final List<Path> tempFiles = new ArrayList<>();
 
     public static boolean fileExists(String path) {
         // First check classpath for resources when running from JAR
