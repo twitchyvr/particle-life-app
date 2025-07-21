@@ -9,7 +9,19 @@ brew config | grep "CPU"
 # We need to install x86_64 Homebrew first if not present
 if [ ! -d "/usr/local/bin/brew" ]; then
     echo "Installing x86_64 Homebrew..."
-    arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    TEMP_SCRIPT="/tmp/install_homebrew.sh"
+    curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$TEMP_SCRIPT"
+    EXPECTED_CHECKSUM="INSERT_EXPECTED_CHECKSUM_HERE"
+    ACTUAL_CHECKSUM=$(shasum -a 256 "$TEMP_SCRIPT" | awk '{print $1}')
+    if [ "$ACTUAL_CHECKSUM" != "$EXPECTED_CHECKSUM" ]; then
+        echo "Error: Checksum verification failed for the Homebrew installation script."
+        echo "Expected: $EXPECTED_CHECKSUM"
+        echo "Actual: $ACTUAL_CHECKSUM"
+        rm -f "$TEMP_SCRIPT"
+        exit 1
+    fi
+    arch -x86_64 /bin/bash "$TEMP_SCRIPT"
+    rm -f "$TEMP_SCRIPT"
 fi
 
 # Now install x86_64 Java using x86_64 Homebrew
