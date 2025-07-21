@@ -4,3 +4,4 @@ build/
 out/
 bin/  # for eclipse
 *.class
+.DS_Store
