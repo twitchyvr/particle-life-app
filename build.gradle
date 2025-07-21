@@ -1,12 +1,14 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group = 'com.particle.life.app'
 version = '1.0'
 
 repositories {
+    mavenLocal()  // Use local maven repo first
     mavenCentral()
     maven { url 'https://jitpack.io' }
 }
@@ -58,7 +60,7 @@ if (osName.contains('mac') || osName.contains('darwin')) {
 
 dependencies {
     // Core dependencies
-    implementation "com.github.tom-mohr:particle-life:v0.5.1"
+    implementation "com.github.tom-mohr:particle-life:v0.5.0"  // Using locally built version
     implementation 'com.esotericsoftware.yamlbeans:yamlbeans:1.17'
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
     implementation 'org.apache.commons:commons-text:1.12.0'
@@ -75,6 +77,10 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-glfw::${lwjglNatives}"
     runtimeOnly "org.lwjgl:lwjgl-opengl::${lwjglNatives}"
     runtimeOnly "org.lwjgl:lwjgl-stb::${lwjglNatives}"
+    
+    // Test dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     
     // ImGui - updated to latest version for better ARM64 compatibility
     implementation 'io.github.spair:imgui-java-app:1.89.0'
@@ -113,6 +119,11 @@ task fatJar {
 run {
     // Ensure we use the right JVM args on macOS
     jvmArgs = applicationDefaultJvmArgs
+}
+
+// Test configuration
+test {
+    useJUnitPlatform()
 }
 
 // Task to display detected platform information
