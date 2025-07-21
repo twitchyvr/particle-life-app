@@ -26,11 +26,13 @@ done
 echo ""
 echo "Native library architectures:"
 cd natives
-for lib in *.dylib *.jnilib 2>/dev/null; do
+shopt -s nullglob
+for lib in *.dylib *.jnilib; do
     if [ -f "$lib" ]; then
         echo "$lib: $(lipo -info "$lib" 2>&1)"
     fi
 done
+shopt -u nullglob
 
 # Try to run with correct library path
 echo ""
