@@ -2,8 +2,8 @@
 
 echo "Testing the newly built JAR..."
 
-# Set Java 17
-export JAVA_HOME=/opt/homebrew/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home
+# Dynamically detect JAVA_HOME
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 export PATH="$JAVA_HOME/bin:$PATH"
 
 # Find the actual JAR name
