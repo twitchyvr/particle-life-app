@@ -6,6 +6,14 @@ echo "Running Particle Life with extracted natives..."
 WORK_DIR=$(mktemp -d -t particle-life-runtime-XXXXXX)
 JAR_PATH="$HOME/Documents/particle-life-app/build/libs/particle-life-app-all.jar"
 
+# Define cleanup function
+cleanup() {
+    echo "Cleaning up temporary directory..."
+    rm -rf "$WORK_DIR"
+}
+
+# Ensure cleanup on script exit or interruption
+trap cleanup EXIT INT TERM
 # Create work directory for natives
 mkdir -p "$WORK_DIR/natives"
 
