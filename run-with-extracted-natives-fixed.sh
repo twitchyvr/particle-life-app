@@ -26,11 +26,13 @@ done
 echo ""
 echo "Native library architectures:"
 cd natives
+shopt -s nullglob
 for lib in *.dylib; do
     if [ -f "$lib" ]; then
         echo "$lib: $(lipo -info "$lib" 2>&1)"
     fi
 done
+shopt -u nullglob
 
 echo ""
 echo "Architecture mismatch detected!"
