@@ -1,0 +1,9 @@
+@@ -298,7 +298,7 @@
+ 
+     @Deprecated
+     public void setupImGuiCallbacks() {
+-        final ImGuiIO io = ImGui.getIO();
++        // Use the instance field io instead of creating a new local variable
+ 
+         // ------------------------------------------------------------
+         // Mouse cursor callback

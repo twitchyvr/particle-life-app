@@ -39,46 +39,37 @@ public class ImGuiLayer {
         // This line is critical for Dear ImGui to work.
         ImGui.createContext();
 
-        // Fix key mapping issue for ImGui 1.89.0
+        // Initialize ImGui IO
         io = ImGui.getIO();
-        int[] keyMap = new int[ImGuiKey.COUNT];
-        for (int i = 0; i < ImGuiKey.COUNT; i++) {
-            keyMap[i] = -1;
-        }
-        io.setKeyMap(keyMap);
+
+        io.setIniFilename(null); // We don't want to save .ini file
+        io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
+        io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors); // Mouse cursors to display while resizing windows etc.
+        io.setBackendPlatformName("imgui_java_impl_glfw");
 
         // ------------------------------------------------------------
-        // Initialize ImGuiIO config
-        io = ImGui.getIO();
-// 
-//         io.setIniFilename(null); // We don't want to save .ini file
-//         io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
-//         io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors); // Mouse cursors to display while resizing windows etc.
-//         io.setBackendPlatformName("imgui_java_impl_glfw");
-// 
-//         // ------------------------------------------------------------
-//         // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
-//         final int[] keyMap = new int[ImGuiKey.COUNT];
-//         keyMap[ImGuiKey.Tab] = GLFW_KEY_TAB;
-//         keyMap[ImGuiKey.LeftArrow] = GLFW_KEY_LEFT;
-//         keyMap[ImGuiKey.RightArrow] = GLFW_KEY_RIGHT;
-//         keyMap[ImGuiKey.UpArrow] = GLFW_KEY_UP;
-//         keyMap[ImGuiKey.DownArrow] = GLFW_KEY_DOWN;
-//         keyMap[ImGuiKey.PageUp] = GLFW_KEY_PAGE_UP;
-//         keyMap[ImGuiKey.PageDown] = GLFW_KEY_PAGE_DOWN;
-//         keyMap[ImGuiKey.Home] = GLFW_KEY_HOME;
-//         keyMap[ImGuiKey.End] = GLFW_KEY_END;
-//         keyMap[ImGuiKey.Insert] = GLFW_KEY_INSERT;
-//         keyMap[ImGuiKey.Delete] = GLFW_KEY_DELETE;
-//         keyMap[ImGuiKey.Backspace] = GLFW_KEY_BACKSPACE;
-//         keyMap[ImGuiKey.Space] = GLFW_KEY_SPACE;
-//         keyMap[ImGuiKey.Enter] = GLFW_KEY_ENTER;
-//         keyMap[ImGuiKey.Escape] = GLFW_KEY_ESCAPE;
-//         keyMap[ImGuiKey.KeyPadEnter] = GLFW_KEY_KP_ENTER;
-//         keyMap[ImGuiKey.A] = GLFW_KEY_A;
-//         keyMap[ImGuiKey.C] = GLFW_KEY_C;
-//         keyMap[ImGuiKey.V] = GLFW_KEY_V;
-//         keyMap[ImGuiKey.X] = GLFW_KEY_X;
+        // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
+        final int[] keyMap = new int[ImGuiKey.COUNT];
+        keyMap[ImGuiKey.Tab] = GLFW_KEY_TAB;
+        keyMap[ImGuiKey.LeftArrow] = GLFW_KEY_LEFT;
+        keyMap[ImGuiKey.RightArrow] = GLFW_KEY_RIGHT;
+        keyMap[ImGuiKey.UpArrow] = GLFW_KEY_UP;
+        keyMap[ImGuiKey.DownArrow] = GLFW_KEY_DOWN;
+        keyMap[ImGuiKey.PageUp] = GLFW_KEY_PAGE_UP;
+        keyMap[ImGuiKey.PageDown] = GLFW_KEY_PAGE_DOWN;
+        keyMap[ImGuiKey.Home] = GLFW_KEY_HOME;
+        keyMap[ImGuiKey.End] = GLFW_KEY_END;
+        keyMap[ImGuiKey.Insert] = GLFW_KEY_INSERT;
+        keyMap[ImGuiKey.Delete] = GLFW_KEY_DELETE;
+        keyMap[ImGuiKey.Backspace] = GLFW_KEY_BACKSPACE;
+        keyMap[ImGuiKey.Space] = GLFW_KEY_SPACE;
+        keyMap[ImGuiKey.Enter] = GLFW_KEY_ENTER;
+        keyMap[ImGuiKey.Escape] = GLFW_KEY_ESCAPE;
+        keyMap[ImGuiKey.KeyPadEnter] = GLFW_KEY_KP_ENTER;
+        keyMap[ImGuiKey.A] = GLFW_KEY_A;
+        keyMap[ImGuiKey.C] = GLFW_KEY_C;
+        keyMap[ImGuiKey.V] = GLFW_KEY_V;
+        keyMap[ImGuiKey.X] = GLFW_KEY_X;
         keyMap[ImGuiKey.Y] = GLFW_KEY_Y;
         keyMap[ImGuiKey.Z] = GLFW_KEY_Z;
         io.setKeyMap(keyMap);

@@ -1,8 +1,8 @@
-#version 410 core
+#version 150 core
 
 uniform vec4 palette[256];
-uniform float time;
 uniform mat4 transform;
+uniform float size;
 
 in vec3 x;
 in vec3 v;
@@ -12,5 +12,6 @@ out vec4 vColor;
 
 void main(void) {
     vColor = palette[type];
-    gl_Position = vec4(x, 1.0);
+    gl_Position = transform * vec4(x, 1.0);
+    gl_PointSize = size * 10.0;
 }

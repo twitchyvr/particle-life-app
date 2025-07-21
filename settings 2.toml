@@ -1,4 +1,4 @@
-shader = "minimal"
+shader = "default"
 cursor_action_right = "Delete"
 cursor_action_left = "Move"
 zoom_step_factor = 1.2
@@ -15,4 +15,4 @@ zoom_smoothness = 0.3
 particle_size_independent = false
 fullscreen = true
 position_setter = "centered"
-palette = "Natural Rainbow.map"
+palette = "Natural_Rainbow.map"

@@ -1,9 +1,12 @@
-@@ -96,7 +96,7 @@
-         });
+@@ -40,10 +40,10 @@
+     @SuppressWarnings("FieldCanBeLocal")
+     private Graphics graphics;
  
-         // ------------------------------------------------------------
+     public void init(Graphics graphics) {
+         this.graphics = graphics;
+ 
+         // Initialize ImGui
+         ImGui.createContext();
+ 
 -        ImGuiIO io = ImGui.getIO();
-+        final ImGuiIO io = ImGui.getIO();
- 
-         io.setIniFilename(null); // We don't want to save .ini file
-         io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
++        io = ImGui.getIO();

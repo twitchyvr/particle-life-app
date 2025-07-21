@@ -1,0 +1,7 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources
+> Task :classes
+
+> Task :run
+Using LWJGL 3.3.1 build 7
+ImGui shaders compiled successfully with GLSL version: #version 410 core

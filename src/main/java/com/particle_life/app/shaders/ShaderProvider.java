@@ -22,7 +22,7 @@ public class ShaderProvider implements InfoWrapperProvider<ParticleShader> {
         public String description = "";
         public String vertex = "default.vert";
         public String geometry = "default.geom";
-        public String fragment = "default.geom";
+        public String fragment = "default.frag";
         public BlendMode blend = BlendMode.normal;
     }
 

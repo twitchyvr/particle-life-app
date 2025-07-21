@@ -192,12 +192,11 @@ public final class ImGuiImplGl3 {
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, drawData.getCmdListIdxBufferData(cmdListIdx), GL_STREAM_DRAW);
 
             for (int cmdBufferIdx = 0; cmdBufferIdx < drawData.getCmdListCmdBufferSize(cmdListIdx); cmdBufferIdx++) {
-                drawData.getCmdListCmdBufferClipRect(clipRect, cmdListIdx, cmdBufferIdx);
+                ImVec4 clipRectValues = drawData.getCmdListCmdBufferClipRect(cmdListIdx, cmdBufferIdx);
+                clipRect.set(clipRectValues);
 
                 final float clipRectX = (clipRect.x - displayPos.x) * framebufferScale.x;
                 final float clipRectY = (clipRect.y - displayPos.y) * framebufferScale.y;
-                final float clipRectZ = (clipRect.z - displayPos.x) * framebufferScale.x;
-                final float clipRectW = (clipRect.w - displayPos.y) * framebufferScale.y;                final float clipRectY = (clipRect.y - displayPos.y) * framebufferScale.y;
                 final float clipRectZ = (clipRect.z - displayPos.x) * framebufferScale.x;
                 final float clipRectW = (clipRect.w - displayPos.y) * framebufferScale.y;
 

@@ -11,6 +11,7 @@ import com.particle_life.app.shaders.CursorShader;
 import com.particle_life.app.shaders.ParticleShader;
 import com.particle_life.app.shaders.ShaderProvider;
 import com.particle_life.app.utils.*;
+import imgui.ImDrawData;
 import imgui.ImGui;
 import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
@@ -1412,17 +1413,17 @@ public class Main extends App {
             }
             case "z" -> resetCamera(false);
             case "Z" -> resetCamera(true);
-            case "p" -> loop.enqueue(physics::setPositions);
-            case "c" -> loop.enqueue(() -> {
+            case "p" -> { if (loop != null) loop.enqueue(physics::setPositions); }
+            case "c" -> { if (loop != null) loop.enqueue(() -> {
                 TypeSetter previousTypeSetter = physics.typeSetter;
                 physics.typeSetter = typeSetters.getActive();
                 physics.setTypes();
                 physics.typeSetter = previousTypeSetter;
-            });
+            }); }
             case "g" -> showGraphicsWindow.set(!showGraphicsWindow.get());
-            case "m" -> loop.enqueue(physics::generateMatrix);
-            case "b" -> loop.enqueue(() -> physics.settings.wrap ^= true);
-            case " " -> loop.pause ^= true;
+            case "m" -> { if (loop != null) loop.enqueue(physics::generateMatrix); }
+            case "b" -> { if (loop != null) loop.enqueue(() -> physics.settings.wrap ^= true); }
+            case " " -> { if (loop != null) loop.pause ^= true; }
             case "q" -> close();
         }
     }

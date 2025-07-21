@@ -1,4 +1,4 @@
-#version 410
+#version 410 core
 
 in vec4 fColor;
 in vec2 texCoord;  // normalized [-1, 1]

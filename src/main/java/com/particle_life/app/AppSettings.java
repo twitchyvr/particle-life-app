@@ -47,7 +47,7 @@ public class AppSettings extends TomlFile {
     @TomlKey("palette")
     public String palette = "Natural Rainbow.map";
     @TomlKey("shader")
-    public String shader = "default";
+    public String shader = System.getProperty("os.name").toLowerCase().contains("mac") ? "minimal" : "default";
     @TomlKey("time_step")
     public double dt = 0.02;
     @TomlKey("auto_time_step")

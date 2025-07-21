@@ -1,5 +1,4 @@
-#version 410 core
-#pragma optimize(on)
+#version 330 core
 
 uniform mat4 transform;
 uniform vec2 camTopLeft;
@@ -7,19 +6,11 @@ uniform bool wrap;
 uniform float size;
 
 layout (points) in;
-
-/* Why are we setting max_vertices to that number?
- * Because we are drawing at most 4 particles for each input particle (the original one and its 3 periodic copies).
- * And each particle is drawn as a quad with 4 corners,
- * so we are never outputting more than 4 * 4 = 16 vertices.
- */
 layout (triangle_strip, max_vertices = 16) out;
 
 in vec4 vColor[];
 out vec4 fColor;
 out vec2 texCoord;
-
-#define Pi 3.141592564
 
 void quad(vec4 center) {
     float r = 0.5 * size;
@@ -57,10 +48,6 @@ void main() {
     quad(center);
 
     if (wrap) {
-        // Some particles are so close to the edge of the world
-        // that they already appear on the other side.
-        // We need to draw them there as well.
-
         float r = 0.5 * size;
         int dx = 0;
         int dy = 0;

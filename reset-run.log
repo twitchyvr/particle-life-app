@@ -1,0 +1,36 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources
+> Task :classes
+
+> Task :run
+Using LWJGL 3.3.1 build 7
+ImGui shaders compiled successfully with GLSL version: #version 410 core
+Exception in thread "main" java.lang.NullPointerException: Cannot read field "pause" because "this.loop" is null
+	at com.particle_life.app.Main.onKeyPressed(Main.java:1426)
+	at com.particle_life.app.App.lambda$setCallbacks$1(App.java:235)
+	at com.particle_life.app.ImGuiLayer.lambda$initImGui$0(ImGuiLayer.java:109)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at com.particle_life.app.ImGuiLayer.lambda$initImGui$1(ImGuiLayer.java:109)
+	at org.lwjgl.glfw.GLFWKeyCallbackI.callback(GLFWKeyCallbackI.java:44)
+	at org.lwjgl.system.JNI.invokeV(Native Method)
+	at org.lwjgl.glfw.GLFW.glfwPollEvents(GLFW.java:3403)
+	at com.particle_life.app.App.launch(App.java:75)
+	at com.particle_life.app.Main.main(Main.java:56)
+
+> Task :run FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':run'.
+> Process 'command '/usr/local/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home/bin/java'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 7s
+3 actionable tasks: 2 executed, 1 up-to-date

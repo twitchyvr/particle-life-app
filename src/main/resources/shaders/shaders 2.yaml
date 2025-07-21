@@ -1,15 +1,3 @@
-name: "minimal"
-description: "Ultra-minimal OpenGL 1.2 shader"
-vertex: "minimal.vert"
-fragment: "minimal.frag"
-blend: "normal"
----
-name: "simple"
-description: "Simple points shader - macOS compatible"
-vertex: "simple.vert"
-fragment: "simple.frag"
-blend: "normal"
----
 name: "default"
 vertex: "default.vert"
 geometry: "default.geom"

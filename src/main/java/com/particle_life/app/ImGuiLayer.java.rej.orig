@@ -1,12 +1,9 @@
-@@ -50,7 +50,10 @@
+@@ -96,7 +96,7 @@
+         });
  
          // ------------------------------------------------------------
-         // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
--        final int[] keyMap = new int[ImGuiKey.COUNT];
-+        // For ImGui 1.89.0, we need to initialize all keys to -1 first
-+        final int[] keyMap = io.getKeyMap();
-+        for (int i = 0; i < keyMap.length; i++) { keyMap[i] = -1; }
-+        
-         keyMap[ImGuiKey.Tab] = GLFW_KEY_TAB;
-         keyMap[ImGuiKey.LeftArrow] = GLFW_KEY_LEFT;
-         keyMap[ImGuiKey.RightArrow] = GLFW_KEY_RIGHT;
+-        ImGuiIO io = ImGui.getIO();
++        final ImGuiIO io = ImGui.getIO();
+ 
+         io.setIniFilename(null); // We don't want to save .ini file
+         io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard

@@ -1,0 +1,24 @@
+--- a/src/main/java/com/particle_life/app/ImGuiLayer.java
++++ b/src/main/java/com/particle_life/app/ImGuiLayer.java
+@@ -40,10 +40,10 @@
+     @SuppressWarnings("FieldCanBeLocal")
+     private Graphics graphics;
+ 
+     public void init(Graphics graphics) {
+         this.graphics = graphics;
+ 
+         // Initialize ImGui
+         ImGui.createContext();
+ 
+-        ImGuiIO io = ImGui.getIO();
++        io = ImGui.getIO();
+         io.setIniFilename(null); // We don't want to save .ini file
+@@ -298,7 +298,7 @@
+ 
+     @Deprecated
+     public void setupImGuiCallbacks() {
+-        final ImGuiIO io = ImGui.getIO();
++        // Use the instance field io instead of creating a new local variable
+ 
+         // ------------------------------------------------------------
+         // Mouse cursor callback
