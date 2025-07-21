@@ -1,0 +1,10 @@
+@@ -192,7 +192,8 @@
+             for (int cmdBufferIdx = 0; cmdBufferIdx < cmdBufferSize; cmdBufferIdx++) {
+                 // Retrieve callback (it is stored inside ImDrawCmd as UserCallbackData)
+                 int callback = drawData.getCmdListCmdBufferUserCallback(cmdListIdx, cmdBufferIdx);
+-                drawData.getCmdListCmdBufferClipRect(clipRect, cmdListIdx, cmdBufferIdx);
++                // For ImGui 1.89.0, we need to pass the indices first, then the output object
++                drawData.getCmdListCmdBufferClipRect(cmdListIdx, cmdBufferIdx, clipRect);
+ 
+                 if (callback != NULL) {
+                     callUserCallback(drawData, cmdListIdx, cmdBufferIdx);

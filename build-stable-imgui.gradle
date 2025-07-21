@@ -1,0 +1,5 @@
+// Replace the imgui dependency line in build.gradle with:
+implementation 'io.github.spair:imgui-java-app:1.86.10'
+
+// And for macOS natives:
+runtimeOnly 'io.github.spair:imgui-java-natives-macos:1.86.10'

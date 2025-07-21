@@ -1,0 +1,43 @@
+Using LWJGL 3.3.4-snapshot
+[LWJGL] Version: 3.3.4-snapshot
+	 OS: Mac OS X v15.5
+	JRE: macOS aarch64 17.0.16
+	JVM: OpenJDK 64-Bit Server VM v17.0.16+0 by Homebrew
+[LWJGL] Loading JNI library: lwjgl
+	Module: org.lwjgl
+	Using SharedLibraryLoader...
+	Found at: /var/folders/qj/jy79j4f93mn21z4wsgz5ydyh0000gn/T/lwjgl_mattrogers/3.3.4-snapshot/arm64/liblwjgl.dylib
+	Found at: /var/folders/qj/jy79j4f93mn21z4wsgz5ydyh0000gn/T/lwjgl_mattrogers/3.3.4-snapshot/arm64/liblwjgl.dylib
+	Loaded from org.lwjgl.librarypath: /var/folders/qj/jy79j4f93mn21z4wsgz5ydyh0000gn/T/lwjgl_mattrogers/3.3.4-snapshot/arm64/liblwjgl.dylib
+[LWJGL] Closure Registry: ConcurrentHashMap
+[LWJGL] Warning: Failed to instantiate memory allocator: org.lwjgl.system.jemalloc.JEmallocAllocator. Using the system default.
+[LWJGL] MemoryUtil allocator: StdlibAllocator
+[LWJGL] Loading library: glfw
+	Module: org.lwjgl.glfw
+	Using SharedLibraryLoader...
+	Found at: /var/folders/qj/jy79j4f93mn21z4wsgz5ydyh0000gn/T/lwjgl_mattrogers/3.3.4-snapshot/arm64/libglfw.dylib
+	Loaded from org.lwjgl.librarypath: /var/folders/qj/jy79j4f93mn21z4wsgz5ydyh0000gn/T/lwjgl_mattrogers/3.3.4-snapshot/arm64/libglfw.dylib
+[LWJGL] Loading library: objc
+	Module: org.lwjgl
+	libobjc.dylib not found in org.lwjgl.librarypath=/var/folders/qj/jy79j4f93mn21z4wsgz5ydyh0000gn/T/lwjgl_mattrogers/3.3.4-snapshot/arm64
+	Loaded from system paths: /usr/lib/libobjc.A.dylib
+[LWJGL] Loading JNI library: lwjgl_opengl
+	Module: org.lwjgl.opengl
+	Using SharedLibraryLoader...
+	Found at: /var/folders/qj/jy79j4f93mn21z4wsgz5ydyh0000gn/T/lwjgl_mattrogers/3.3.4-snapshot/arm64/liblwjgl_opengl.dylib
+	Loaded from org.lwjgl.librarypath: /var/folders/qj/jy79j4f93mn21z4wsgz5ydyh0000gn/T/lwjgl_mattrogers/3.3.4-snapshot/arm64/liblwjgl_opengl.dylib
+[LWJGL] Loading library: /System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL
+	Module: org.lwjgl.opengl
+	Success
+ImGui shaders compiled successfully with GLSL version: #version 410 core
+Dear ImGui Assertion Failed: io.KeyMap[n] == -1 || IsNamedKey(key)
+Assertion Located At: /tmp/imgui/jni/imgui.cpp:9125
+java.lang.Exception: Stack trace
+	at java.base/java.lang.Thread.dumpStack(Thread.java:1389)
+	at imgui.ImGui$1.imAssertCallback(ImGui.java:63)
+	at imgui.assertion.ImAssertCallback.imAssert(ImAssertCallback.java:21)
+	at imgui.ImGui.nNewFrame(Native Method)
+	at imgui.ImGui.newFrame(ImGui.java:248)
+	at com.particle_life.app.Main.draw(Main.java:444)
+	at com.particle_life.app.App.launch(App.java:80)
+	at com.particle_life.app.Main.main(Main.java:55)

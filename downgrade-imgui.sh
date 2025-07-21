@@ -1,3 +1,11 @@
+#!/bin/bash
+
+echo "Downgrading ImGui to stable version 1.86.10..."
+
+cd ~/Documents/particle-life-app
+
+# Create a new build.gradle with older ImGui version
+cat > build-imgui-stable.gradle << 'EOF'
 plugins {
     id 'java'
     id 'application'
@@ -102,3 +110,18 @@ run {
 test {
     useJUnitPlatform()
 }
+EOF
+
+# Use the stable build file
+cp build-imgui-stable.gradle build.gradle
+
+# Clean and rebuild
+echo "Cleaning old build..."
+./gradlew clean
+
+echo "Building with stable ImGui..."
+./gradlew shadowJar
+
+echo ""
+echo "Testing with stable ImGui version..."
+java -XstartOnFirstThread -jar build/libs/particle-life-app-1.0-all.jar
