@@ -106,7 +106,9 @@ public class ResourceAccess {
             extension = fileName.substring(dotIndex);
         }
         
-        Path tempFile = Files.createTempFile("particle-life-resource-", extension);
+        Path tempFile = Files.createTempFile("particle-life-resource-", extension,
+                java.nio.file.attribute.PosixFilePermissions.asFileAttribute(
+                        java.nio.file.attribute.PosixFilePermissions.fromString("rw-------")));
         synchronized (tempFiles) {
             tempFiles.add(tempFile);
         }
