@@ -3,7 +3,7 @@
 echo "Testing the Shadow JAR..."
 
 # Set Java 17
-export JAVA_HOME=/opt/homebrew/Cellar/openjdk@17/17.0.16/libexec/openjdk.jdk/Contents/Home
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 export PATH="$JAVA_HOME/bin:$PATH"
 
 cd build/libs
