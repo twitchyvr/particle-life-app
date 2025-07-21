@@ -3,11 +3,10 @@
 echo "Running Particle Life with extracted natives..."
 
 # Setup directories
-WORK_DIR="/tmp/particle-life-runtime"
+WORK_DIR=$(mktemp -d -t particle-life-runtime-XXXXXX)
 JAR_PATH="$HOME/Documents/particle-life-app/build/libs/particle-life-app-all.jar"
 
-# Clean and create work directory
-rm -rf "$WORK_DIR"
+# Create work directory for natives
 mkdir -p "$WORK_DIR/natives"
 
 # Extract the JAR to check for natives
