@@ -175,7 +175,11 @@ public abstract class App {
             IntBuffer width = stack.mallocInt(1);
             IntBuffer height = stack.mallocInt(1);
             IntBuffer channels = stack.mallocInt(1);
-            ByteBuffer pixels = STBImage.stbi_load(iconPath, width, height, channels, 4);
+            
+            // Get the actual file path, extracting from JAR if necessary
+            String actualIconPath = com.particle_life.app.io.ResourceAccess.getResourcePath(iconPath);
+            
+            ByteBuffer pixels = STBImage.stbi_load(actualIconPath, width, height, channels, 4);
             if (pixels == null) {
                 throw new IOException("Failed to load window icon: " + STBImage.stbi_failure_reason());
             }

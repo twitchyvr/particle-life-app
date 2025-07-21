@@ -3,8 +3,4 @@
 build/
 out/
 bin/  # for eclipse
-
-# Test files for development
-BeforeCloseTest.java
-OriginalBugTest.java
 *.class

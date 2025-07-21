@@ -181,7 +181,15 @@ public class ImGuiLayer {
 
         final ImFontAtlas fontAtlas = io.getFonts();
         final ImFontConfig fontConfig = new ImFontConfig(); // Natively allocated object, should be explicitly destroyed
-        fontAtlas.addFontFromFileTTF(".internal/Futura Heavy font.ttf", 16, fontConfig);
+        
+        try {
+            String fontPath = com.particle_life.app.io.ResourceAccess.getResourcePath(".internal/Futura Heavy font.ttf");
+            fontAtlas.addFontFromFileTTF(fontPath, 16, fontConfig);
+        } catch (java.io.IOException e) {
+            System.err.println("Could not load font file! " + e.getMessage());
+            // Continue with default font only
+        }
+        
         fontAtlas.addFontDefault(); // Add a default font, which is 'ProggyClean.ttf, 13px'
         fontConfig.destroy(); // After all fonts were added we don't need this config anymore
 
