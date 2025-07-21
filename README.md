@@ -38,6 +38,37 @@ Then start the program:
 After some time, the program should launch and you should see particles on your screen.
 Feel free to mess with the code!
 
+## Running on Apple Silicon (M1/M2) Macs
+
+Due to current limitations with ImGui-Java native libraries, you need to run under x86_64 emulation:
+
+1. Install x86_64 Java:
+   ```bash
+   # Check if Homebrew is already installed under x86_64
+   if ! arch -x86_64 /usr/local/bin/brew --version &>/dev/null; then
+       echo "Homebrew not found. Installing Homebrew for x86_64..."
+       arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   else
+       echo "Homebrew is already installed under x86_64."
+   fi
+   # Install Java using Homebrew
+   arch -x86_64 /usr/local/bin/brew install openjdk@17
+   ```
+2. Build the project:
+   ```bash
+   ./gradlew shadowJar
+   ```
+3. Extract resources and run:
+   ```bash
+   mkdir -p temp_internal
+   jar xf build/libs/particle-life-app-all.jar .internal
+   mv .internal temp_internal/
+   arch -x86_64 $(brew --prefix openjdk@17)/bin/java -XstartOnFirstThread -Djava.io.tmpdir=temp_internal -jar build/libs/particle-life-app-all.jar
+   rm -rf temp_internal
+   ```
+
+**Note:** Native ARM64 support pending ImGui-Java update.
+
 ### Platform Support
 
 The application automatically detects your operating system and architecture to include the appropriate native libraries:
